@@ -63,7 +63,7 @@ const handleNormalMovement = (x, y) => {
 	return { x: x1, y: y1 };
 };
 
-export default function movePawn(x, y, color = 'yellow') {
+export default function movePawn({ x, y, color = 'yellow' }) {
 	if (allowedEntryColor(x, y) === color) return handleNormalMovement(x, y);
 	if (isAnyEdgePoint(x, y)) return handleEdgePoints(x, y);
 	return handleNormalMovement(x, y);
