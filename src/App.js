@@ -166,7 +166,7 @@ export default function App() {
 	}, [remainingPawnSteps, selectedPawn]);
 	const handleDiceClick = () => {
 		if (isTurnUsed) return;
-		const newDiceValue = getRandomInt(5, 7);
+		const newDiceValue = getRandomInt(1, 7);
 		if (newDiceValue !== 6 && checkIfAllPawnAtHome(positions, currentTurn)) {
 			console.log('ifallathome', checkIfAllPawnAtHome(positions, currentTurn));
 			setCurrentTurn((prev) => updateTurn(prev));
@@ -194,6 +194,15 @@ export default function App() {
 				<Dice onClick={handleDiceClick} turn={currentTurn} diceValue={diceValue} />
 				<CenterSquare x={6} y={6} />
 			</div>
+			{/* <NewDice /> */}
 		</div>
 	);
 }
+
+// const NewDice = () => {
+// 	return (
+// 		<div>
+
+// 		</div>
+// 	);
+// };

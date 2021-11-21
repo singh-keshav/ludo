@@ -17,7 +17,7 @@ const Pawn = ({ x, y, color, onClick, hightLight, pawnNumber }) => {
 				borderRadius: '50%',
 				backgroundColor: color,
 				cursor: 'pointer',
-				border: hightLight === color ? '4px solid black' : null,
+				border: hightLight === color ? '4px solid pink' : '1px solid black',
 			}}
 			onClick={() => onClick(color, pawnNumber)}
 		></div>

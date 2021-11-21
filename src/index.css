@@ -1,45 +1,101 @@
-body {
-	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-		'Droid Sans', 'Helvetica Neue', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-code {
-	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
 * {
 	box-sizing: border-box;
+	margin: 0;
+	padding: 0px;
 }
 
-#triangle-up {
-	width: 0;
-	height: 0;
-	border-left: 50px solid transparent;
-	border-right: 50px solid transparent;
-	border-bottom: 50px solid blue;
-}
-#triangle-down {
-	width: 0;
-	height: 0;
-	border-left: 50px solid transparent;
-	border-right: 50px solid transparent;
-	border-top: 50px solid green;
+body {
+	height: 100vh;
+	perspective: 1000px;
+	background: radial-gradient(#fff, #8bb1c1cf);
 }
 
-#triangle-left {
-	width: 0;
-	height: 0;
-	border-top: 50px solid transparent;
-	border-bottom: 50px solid transparent;
-	border-right: 50px solid yellow;
+body,
+.container,
+.container > div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transform-style: preserve-3d;
 }
-#triangle-right {
-	width: 0;
-	height: 0;
-	border-top: 50px solid transparent;
-	border-bottom: 50px solid transparent;
-	border-left: 50px solid red;
+
+.container {
+	width: 3rem;
+	height: 3rem;
+	/* background-color: transparent; */
+	transition: all 500ms;
+	/* animation: rolling 10s 0.2s linear; */
+}
+/* transform: rotateX(90deg); */
+.container > div {
+	position: absolute;
+	font-size: 10em;
+	color: white;
+	width: 100%;
+	height: 100%;
+	/* border: 3px solid #ffffff69; */
+	background: linear-gradient(45deg, #4caf50, #607d8b);
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	padding: 0.5rem;
+	gap: 0.1rem;
+}
+.container > div > div {
+	background-color: #fff;
+	border-radius: 50%;
+	width: 95%;
+	height: 95%;
+}
+.point-1 {
+	grid-area: 1/1;
+}
+.point-3 {
+	grid-area: 1/3;
+}
+.point-4 {
+	grid-area: 3/2;
+}
+.point-5 {
+	grid-area: 2/2;
+}
+.point-5 {
+	grid-area: 2/2;
+}
+.point-7 {
+	grid-area: 3/1;
+}
+.point-9 {
+	grid-area: 3/3;
+}
+
+/**********************************/
+.one {
+	transform: translateZ(1.5rem);
+}
+.two {
+	transform: translateZ(-1.5rem) rotateY(-90deg);
+	transform-origin: left;
+}
+.three {
+	transform: translateZ(-1.5rem) rotateY(180deg);
+}
+.four {
+	transform: translateZ(-1.5rem) rotateY(90deg);
+	transform-origin: right;
+}
+.five {
+	transform: translateY(-1.5rem) rotateX(90deg);
+}
+.six {
+	transform: translateY(1.5rem) rotateX(90deg) rotateY(180deg);
+}
+
+@keyframes rolling {
+	0% {
+		transform: rotate3d(3, 4, 1, 0deg);
+	}
+	100% {
+		transform: rotate3d(3, 4, 1, 720deg);
+	}
 }

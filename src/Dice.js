@@ -2,6 +2,15 @@ import { squareLength } from './config';
 
 const numberToColorMap = ['red', 'green', 'blue', 'yellow'];
 
+const numberToFaceMap = {
+	1: 'rotateY(0deg)',
+	2: 'rotateY(90deg)',
+	3: 'rotateY(180deg)',
+	4: 'rotateY(270deg)',
+	5: 'rotateX(270deg)',
+	6: 'rotateX(90deg)',
+};
+
 export const Dice = ({ turn = 'red', onClick, diceValue }) => {
 	const locations = [
 		{ x: 0, y: -squareLength + 'rem' },
@@ -9,6 +18,7 @@ export const Dice = ({ turn = 'red', onClick, diceValue }) => {
 		{ x: 0, y: squareLength * 15 + 'rem' },
 		{ x: squareLength * 14 + 'rem', y: squareLength * 15 + 'rem' },
 	];
+	console.log(numberToFaceMap[diceValue]);
 
 	return (
 		<div>
@@ -29,19 +39,43 @@ export const Dice = ({ turn = 'red', onClick, diceValue }) => {
 				>
 					{numberToColorMap[index] === turn && (
 						<div
-							style={{
-								width: '90%',
-								height: '90%',
-								backgroundColor: 'black',
-								color: 'white',
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								cursor: 'pointer',
-							}}
+							class="container"
 							onClick={onClick}
+							style={{ top: '1px', transform: numberToFaceMap[diceValue] }}
 						>
-							{diceValue}
+							<div class="one">
+								<div class="point-5"></div>
+							</div>
+							<div class="two">
+								<div class="point-3"></div>
+								<div class="point-7"></div>
+							</div>
+							<div class="three">
+								<div class="point-3"></div>
+								<div class="point-5"></div>
+								<div class="point-7"></div>
+							</div>
+							<div class="four">
+								<div class="point-1"></div>
+								<div class="point-3"></div>
+								<div class="point-7"></div>
+								<div class="point-9"></div>
+							</div>
+							<div class="five">
+								<div class="point-1"></div>
+								<div class="point-3"></div>
+								<div class="point-5"></div>
+								<div class="point-7"></div>
+								<div class="point-9"></div>
+							</div>
+							<div class="six">
+								<div class="point-1"></div>
+								<div class="point-3"></div>
+								<div class="point-4"></div>
+								<div class="point-6"></div>
+								<div class="point-7"></div>
+								<div class="point-9"></div>
+							</div>
 						</div>
 					)}
 				</div>
