@@ -18,7 +18,7 @@ export const Dice = ({ turn = 'red', onClick, diceValue }) => {
 		{ x: 0, y: squareLength * 15 + 'rem' },
 		{ x: squareLength * 14 + 'rem', y: squareLength * 15 + 'rem' },
 	];
-	console.log(numberToFaceMap[diceValue]);
+	// console.log(numberToFaceMap[diceValue]);
 
 	return (
 		<div>
@@ -38,11 +38,7 @@ export const Dice = ({ turn = 'red', onClick, diceValue }) => {
 					}}
 				>
 					{numberToColorMap[index] === turn && (
-						<div
-							class="container"
-							onClick={onClick}
-							style={{ top: '1px', transform: numberToFaceMap[diceValue] }}
-						>
+						<div class="container" onClick={onClick} style={{ top: '1px', transform: numberToFaceMap[diceValue || 1] }}>
 							<div class="one">
 								<div class="point-5"></div>
 							</div>

@@ -6,6 +6,7 @@ import movePawn from './move';
 import PawnHome from './PawnHome';
 import Pawns from './Pawns';
 import getRandomInt from './randomNumber';
+import star from './assets/star.png';
 
 const homeCoordinates = {
 	red: { x: 0, y: 0 },
@@ -20,12 +21,33 @@ const startPositions = {
 	yellow: { x: 13, y: 8 },
 	blue: { x: 6, y: 13 },
 };
+// const extraSafePosition = {
+// 	red: { x: 6, y: 2 },
+// 	green: { x: 12, y: 6 },
+// 	yellow: { x: 8, y: 12 },
+// 	blue: { x: 2, y: 8 },
+// };
+
+const safePositions = [
+	{ x: 1, y: 6 },
+	{ x: 8, y: 1 },
+	{ x: 13, y: 8 },
+	{ x: 6, y: 13 },
+	{ x: 6, y: 2 },
+	{ x: 12, y: 6 },
+	{ x: 8, y: 12 },
+	{ x: 2, y: 8 },
+];
 
 const homePawnCoordinates = {
 	1: { x: 1.5, y: 1.5 },
 	2: { x: 3.5, y: 1.5 },
 	3: { x: 1.5, y: 3.5 },
 	4: { x: 3.5, y: 3.5 },
+};
+
+const isPositionSafe = ({ x, y }) => {
+	return safePositions.find((pos) => pos.x === x && pos.y === y);
 };
 
 const checkIfAllPawnAtHome = (positions, color) => {
@@ -38,10 +60,13 @@ const checkIfAllPawnAtHome = (positions, color) => {
 	return true;
 };
 
-const Square = ({ color, x, y }) => {
+const Square = ({ color, x, y, isPositionSafe }) => {
 	return (
 		<div
 			style={{
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center',
 				width: squareLength + 'rem',
 				height: squareLength + 'rem',
 				background: color,
@@ -51,7 +76,7 @@ const Square = ({ color, x, y }) => {
 				left: x * squareLength + 'rem',
 			}}
 		>
-			{/* {x + ',' + y} */}
+			{isPositionSafe ? <img src={star} alt="" style={{ width: '90%', height: '90%' }} /> : null}
 		</div>
 	);
 };
@@ -71,8 +96,14 @@ const findSqareColor = (x, y) => {
 
 const PlayerBox = () => {
 	const length = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-	const row = (y) => length.map((x) => <Square key={x} y={y} color={findSqareColor(x, y)} x={x} />);
-	const column = (x) => length.map((y) => <Square key={y} y={y} color={findSqareColor(x, y)} x={x} />);
+	const row = (y) =>
+		length.map((x) => (
+			<Square key={x} y={y} color={findSqareColor(x, y)} x={x} isPositionSafe={isPositionSafe({ x, y })} />
+		));
+	const column = (x) =>
+		length.map((y) => (
+			<Square key={y} y={y} color={findSqareColor(x, y)} x={x} isPositionSafe={isPositionSafe({ x, y })} />
+		));
 	return (
 		<div style={{ width: squareLength * 15 + 'rem', height: squareLength * 15 + 'rem', background: 'gray' }}>
 			<div>{[6, 7, 8].map((yco, index) => row(yco))}</div>
@@ -106,6 +137,24 @@ const updateTurn = (currentTurn) => {
 	return turns[(currenTurnIndex + 1) % 4];
 };
 
+const getPawnAtPosition = (x, y, positions) => {
+	let pawn = null;
+	for (const color in positions) {
+		if (Object.hasOwnProperty.call(positions, color)) {
+			for (const pawnNumber in positions[color]) {
+				if (Object.hasOwnProperty.call(positions[color], pawnNumber)) {
+					const pawnX = positions[color][pawnNumber].x;
+					const pawnY = positions[color][pawnNumber].y;
+					if (pawnX === x && pawnY === y) {
+						pawn = { color, pawnNumber };
+					}
+				}
+			}
+		}
+	}
+	return pawn;
+};
+
 export default function App() {
 	const [positions, setPositions] = useState({
 		red: initialPositions('red'),
@@ -114,16 +163,41 @@ export default function App() {
 		blue: initialPositions('blue'),
 	});
 	const [currentTurn, setCurrentTurn] = useState('red');
-	const [selectedPawn, setSelectedPawn] = useState(null);
-	const [diceValue, setDiceValue] = useState(6);
-	const [isDiceValueUsed, setIsDiceValueUsed] = useState(false);
-	const [isTurnUsed, setIsTurnUsed] = useState(false);
-	const [remainingPawnSteps, setRemainingPawnSteps] = useState(0);
+	const [diceValue, setDiceValue] = useState(null);
 
-	const handlePawnClick = (color, pawnNumber) => {
+	console.log({ currentTurn, diceValue, positions });
+
+	const handleDiceClick = () => {
+		if (diceValue) return;
+		const newDiceValue = getRandomInt(5, 7);
+		setDiceValue(newDiceValue);
+	};
+
+	const handlePawnKill = ({ color, pawnNumber }) => {
+		setPositions((prev) => ({
+			...prev,
+			[color]: { ...prev[color], [pawnNumber]: initialPositions(color)[pawnNumber] },
+		}));
+		setDiceValue(null);
+	};
+
+	useEffect(() => {
+		if (diceValue && diceValue !== 6 && checkIfAllPawnAtHome(positions, currentTurn)) {
+			setCurrentTurn((prev) => updateTurn(prev));
+			setDiceValue(null);
+		}
+		//show and set allowed clickable pawns
+	}, [diceValue]);
+
+	const handlePawnClick = async (color, pawnNumber) => {
+		//Todo: check if allowed clickable pawn, if not return
+		//remove below condition once above function is ready
 		if (color !== currentTurn) return;
-		if (isDiceValueUsed) return;
+		if (!diceValue) return;
 		const currentPosition = positions[color][pawnNumber];
+		console.log({ slectedPawn: { color, pawnNumber } });
+		console.log({ pawnatpostion: getPawnAtPosition(currentPosition.x, currentPosition.y, positions) });
+
 		if (
 			currentPosition.x === initialPositions(color)[pawnNumber].x &&
 			currentPosition.y === initialPositions(color)[pawnNumber].y
@@ -134,56 +208,43 @@ export default function App() {
 					[currentTurn]: { ...prev[currentTurn], [pawnNumber]: startPositions[color] },
 				}));
 				setCurrentTurn((prev) => updateTurn(prev));
-				setIsDiceValueUsed(true);
-				setIsTurnUsed(false);
-			} else if (checkIfAllPawnAtHome(positions, currentTurn)) {
-				setCurrentTurn((prev) => updateTurn(prev));
+				setDiceValue(null);
 			}
-		} else {
-			setSelectedPawn(pawnNumber);
-			setRemainingPawnSteps(diceValue);
-			setIsDiceValueUsed(true);
-			setIsTurnUsed(false);
+			return;
 		}
-	};
+		let moves = diceValue;
+		let finalPawnPosition = currentPosition;
 
-	useEffect(() => {
-		if (selectedPawn && remainingPawnSteps > 0) {
-			setTimeout(() => {
-				setRemainingPawnSteps((prev) => --prev);
-				setPositions((prev) => ({
-					...prev,
-					[currentTurn]: {
-						...prev[currentTurn],
-						[selectedPawn]: movePawn({ ...prev[currentTurn][selectedPawn], color: currentTurn }),
-					},
-				}));
-			}, 300);
+		console.log({ finalPawnPosition });
+		while (moves--) {
+			finalPawnPosition = movePawn({ x: finalPawnPosition.x, y: finalPawnPosition.y, color });
+			await new Promise((resolve) => {
+				setTimeout(() => {
+					resolve(
+						setPositions((prev) => ({
+							...prev,
+							[currentTurn]: {
+								...prev[currentTurn],
+								[pawnNumber]: movePawn({ ...prev[currentTurn][pawnNumber], color: currentTurn }),
+							},
+						}))
+					);
+				}, 300);
+			});
 		}
-		if (remainingPawnSteps === 0) {
-			setCurrentTurn((prev) => updateTurn(prev));
+		const otherPawnAtFinalPosition = getPawnAtPosition(finalPawnPosition.x, finalPawnPosition.y, positions);
+		if (otherPawnAtFinalPosition && otherPawnAtFinalPosition.color !== color && !isPositionSafe(finalPawnPosition)) {
+			return handlePawnKill({ color: otherPawnAtFinalPosition.color, pawnNumber: otherPawnAtFinalPosition.pawnNumber });
 		}
-	}, [remainingPawnSteps, selectedPawn]);
-	const handleDiceClick = () => {
-		if (isTurnUsed) return;
-		const newDiceValue = getRandomInt(1, 7);
-		if (newDiceValue !== 6 && checkIfAllPawnAtHome(positions, currentTurn)) {
-			console.log('ifallathome', checkIfAllPawnAtHome(positions, currentTurn));
-			setCurrentTurn((prev) => updateTurn(prev));
-			setIsTurnUsed(false);
-			setDiceValue(newDiceValue);
-			setIsDiceValueUsed(false);
-		} else {
-			setDiceValue(newDiceValue);
-			setIsDiceValueUsed(false);
-			setIsTurnUsed(true);
+		if (diceValue === 6) {
+			setDiceValue(null);
+			return;
 		}
+		setCurrentTurn((prev) => updateTurn(prev));
+		setDiceValue(null);
 	};
 	return (
-		<div
-			className="App"
-			style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
-		>
+		<div className="App" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
 			<div style={{ position: 'relative' }}>
 				<PlayerBox />
 				<PawnHome color="red" x={0} y={0} />
@@ -198,11 +259,3 @@ export default function App() {
 		</div>
 	);
 }
-
-// const NewDice = () => {
-// 	return (
-// 		<div>
-
-// 		</div>
-// 	);
-// };
